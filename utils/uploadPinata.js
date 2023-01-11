@@ -6,6 +6,7 @@ const pinata = new pinataSDK(process.env.PINATA_API_KEY, process.env.PINATA_API_
 
 async function storeImageinIPFS(imagepath)
 {
+    console.log('inside storeimage fnction')
     const fullImagePath=path.resolve(imagepath)
     const files=fs.readdirSync(fullImagePath).filter((file) => file.includes(".png"))
     let responses=[];
@@ -25,7 +26,7 @@ async function storeImageinIPFS(imagepath)
         catch(e)
         {console.log(26,e)}
     }
-    return responses,files
+    return {responses,files}
 }
 async function storeTokenUriMetadata(metadata) {
     const options = {

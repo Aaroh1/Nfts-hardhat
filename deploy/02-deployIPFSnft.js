@@ -23,10 +23,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
-    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock, tokenURIs=[], arguments
+    let vrfCoordinatorV2Address, subscriptionId, vrfCoordinatorV2Mock
+    let tokenURIs = [
+        "ipfs://QmZYmH5iDbD6v3U2ixoVAjioSzvWJszDzYdbeCLquGSpVm",
+        "ipfs://QmYQC5aGZu2PTH8XzbJrbDnvhj3gVs7ya33H9mqUNvST3d",
+        "ipfs://QmaVkBn2tKmjbhphU7eyztbvSQU5EXDdqRyXZtRhSGgJGo",
+    ]
 
-    if (process.env.UPLOAD_PINATA === "true") {
-        await handleUpload()
+    if (process.env.UPLOAD_PINATA == "true") {
+        tokenURIs = await handleUpload()
     }
 
     if (chainId == 31337) {
@@ -48,7 +53,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         : VERIFICATION_BLOCK_CONFIRMATIONS
 
     log("----------------------------------------------------")
-    arguments = [
+    const arguments = [
         vrfCoordinatorV2Address,
         subscriptionId,
         networkConfig[chainId]["gasLane"],
@@ -62,23 +67,28 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1,
     })
-    // Ensure the lottery contract is a valid consumer of the VRFCoordinatorV2Mock contract.
+    // Ensure the contract is a valid consumer of the VRFCoordinatorV2Mock contract.
     if (developmentChains.includes(network.name)) {
         const vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
-        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, lottery.address)
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, randomIpfsNft.address)
     }
 }
 
 async function handleUpload() {
-    const { responses, files } = await storeImageinIPFS(imagesLocation)
+    const { responses, files } = storeImageinIPFS
+    let tokenURIs = []
     for (imageUploadResponseIndex in responses) {
+        console.log("forliip")
         let tokenUriMetadata = { ...metadataTemplate }
         tokenUriMetadata.name = files[imageUploadResponseIndex].replace(".png", "")
         tokenUriMetadata.description = `An adorable ${tokenUriMetadata.name} pup!`
-        tokenUriMetadata.image = `ipfs://${imageUploadResponses[imageUploadResponseIndex].IpfsHash}`
+        tokenUriMetadata.image = `ipfs://${responses[imageUploadResponseIndex].IpfsHash}`
         console.log(`Uploading ${tokenUriMetadata.name}...`)
         const metadataUploadResponse = await storeTokenUriMetadata(tokenUriMetadata)
         tokenURIs.push(`ipfs://${metadataUploadResponse.IpfsHash}`)
     }
+    console.log("Token URIs uploaded! They are:")
+    console.log(tokenURIs)
+    return tokenURIs
 }
 module.exports.tags = ["all", "IPFSnft"]
