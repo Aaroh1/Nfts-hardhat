@@ -25,7 +25,14 @@ const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "Your polygonscan
 const REPORT_GAS = process.env.REPORT_GAS || false
 
 module.exports = {
-    solidity: "0.8.17",
+    solidity: {compilers: [
+        {
+            version: "0.8.8",
+        },
+        {
+            version: "0.6.6",
+        },
+    ]},
     defaultNetwork: "hardhat",
     networks: {
         hardhat: {

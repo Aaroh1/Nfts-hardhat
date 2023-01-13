@@ -32,11 +32,14 @@ const developmentChains = ["hardhat", "localhost"]
 const VERIFICATION_BLOCK_CONFIRMATIONS = 6
 // const frontEndContractsFile = "../lottery-fullstack/constants/contractAddress.json"
 // const frontEndAbiFile = "../lottery-fullstack/constants/abi.json"
-
+const DECIMALS = "18"
+const INITIAL_PRICE = "200000000000000000000"
 module.exports = {
     networkConfig,
     developmentChains,
     VERIFICATION_BLOCK_CONFIRMATIONS,
+    DECIMALS,
+    INITIAL_PRICE
     // frontEndContractsFile,
     // frontEndAbiFile,
 }
